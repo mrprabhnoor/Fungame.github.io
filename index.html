@@ -19,7 +19,7 @@
       background: #111;
       margin-top: 20px;
     }
-    #controls {
+    #controls, #message {
       margin-top: 15px;
     }
     #mobile-controls {
@@ -42,6 +42,11 @@
       border-radius: 8px;
       min-width: 60px;
     }
+    #message {
+      font-size: 18px;
+      font-weight: bold;
+      color: #f5c542;
+    }
   </style>
   <audio id="eatSound" src="https://www.fesliyanstudios.com/play-mp3/387" preload="auto"></audio>
 </head>
@@ -50,12 +55,14 @@
   <div id="controls">
     <label for="difficulty">Difficulty:</label>
     <select id="difficulty">
-      <option value="150">Easy</option>
-      <option value="100" selected>Medium</option>
-      <option value="60">Hard</option>
+      <option value="250">Easy</option>
+      <option value="150" selected>Medium</option>
+      <option value="80">Hard</option>
     </select>
+    <button class="btn" id="startBtn">Start Game</button>
   </div>
   <canvas id="gameCanvas" width="300" height="300"></canvas>
+  <div id="message"></div>
   <div id="mobile-controls">
     <div class="row"><button class="btn" onclick="changeDirection('up')">↑</button></div>
     <div class="row">
@@ -70,21 +77,17 @@
     const ctx = canvas.getContext("2d");
     const eatSound = document.getElementById("eatSound");
     const difficultySelect = document.getElementById("difficulty");
+    const startBtn = document.getElementById("startBtn");
+    const messageBox = document.getElementById("message");
 
     const box = 20;
     const canvasSize = canvas.width;
-    let snake = [{ x: 160, y: 160 }];
+    let snake = [];
     let direction = "right";
-    let food = spawnFood();
+    let food;
     let score = 0;
-    let frameDelay = parseInt(difficultySelect.value);
-    let gameInterval;
-
-    difficultySelect.addEventListener("change", () => {
-      frameDelay = parseInt(difficultySelect.value);
-      clearInterval(gameInterval);
-      gameInterval = setInterval(gameLoop, frameDelay);
-    });
+    let frameDelay;
+    let gameInterval = null;
 
     function spawnFood() {
       return {
@@ -98,31 +101,36 @@
       ctx.fillRect(x, y, box, box);
     }
 
+    function resetGame() {
+      snake = [{ x: 160, y: 160 }];
+      direction = "right";
+      food = spawnFood();
+      score = 0;
+      messageBox.textContent = '';
+    }
+
     function gameLoop() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Move snake
       let head = { ...snake[0] };
       if (direction === "right") head.x += box;
       else if (direction === "left") head.x -= box;
       else if (direction === "up") head.y -= box;
       else if (direction === "down") head.y += box;
 
-      // Check wall collision
-      if (head.x < 0 || head.x >= canvasSize || head.y < 0 || head.y >= canvasSize || snake.some(segment => segment.x === head.x && segment.y === head.y)) {
-        alert("Game Over! Your score: " + score);
-        snake = [{ x: 160, y: 160 }];
-        direction = "right";
-        food = spawnFood();
-        score = 0;
+      if (
+        head.x < 0 || head.x >= canvasSize ||
+        head.y < 0 || head.y >= canvasSize ||
+        snake.some(segment => segment.x === head.x && segment.y === head.y)
+      ) {
         clearInterval(gameInterval);
-        gameInterval = setInterval(gameLoop, frameDelay);
+        gameInterval = null;
+        messageBox.textContent = `Game Over! Your score: ${score}`;
         return;
       }
 
       snake.unshift(head);
 
-      // Check food
       if (head.x === food.x && head.y === food.y) {
         score++;
         eatSound.currentTime = 0;
@@ -132,12 +140,18 @@
         snake.pop();
       }
 
-      // Draw everything
       snake.forEach((segment, index) => {
         drawBox(segment.x, segment.y, index === 0 ? "#0f0" : "#0b0");
       });
 
       drawBox(food.x, food.y, "red");
+    }
+
+    function startGame() {
+      if (gameInterval) clearInterval(gameInterval);
+      frameDelay = parseInt(difficultySelect.value);
+      resetGame();
+      gameInterval = setInterval(gameLoop, frameDelay);
     }
 
     function changeDirection(dir) {
@@ -154,7 +168,7 @@
       else if (e.key === "ArrowDown") changeDirection("down");
     });
 
-    gameInterval = setInterval(gameLoop, frameDelay);
+    startBtn.addEventListener("click", startGame);
   </script>
 </body>
 </html>
