@@ -1,74 +1,164 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Click Speed Game</title>
   <style>
+    /* Reset & basics */
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+    }
+    .container {
+      background: #2a2a72;
+      padding: 40px 60px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      max-width: 360px;
+      width: 100%;
       text-align: center;
-      margin-top: 50px;
-      background: #111;
-      color: white;
     }
-    button {
-      font-size: 20px;
-      padding: 15px 30px;
-      border: none;
-      border-radius: 10px;
-      background: #ff5c5c;
-      color: white;
-      cursor: pointer;
-    }
-    .score {
-      font-size: 30px;
-      margin: 20px;
+    h1 {
+      margin-bottom: 25px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
     }
     .timer {
-      font-size: 24px;
+      font-size: 22px;
       margin-bottom: 20px;
+      font-weight: 600;
+      user-select: none;
+    }
+    .score {
+      font-size: 28px;
+      margin: 25px 0 35px;
+      font-weight: 700;
+      user-select: none;
+    }
+    button {
+      background: #ff6b6b;
+      border: none;
+      border-radius: 12px;
+      padding: 18px 45px;
+      font-size: 20px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(255, 107, 107, 0.6);
+      transition: background 0.3s ease, transform 0.1s ease;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    button:focus {
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.7);
+    }
+    button:hover:not(:disabled) {
+      background: #ff8787;
+      transform: translateY(-2px);
+    }
+    button:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+    button:disabled {
+      background: #555a77;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    .message {
+      margin-top: 30px;
+      font-size: 20px;
+      min-height: 30px;
+      font-weight: 600;
+      color: #f0e68c;
+      user-select: none;
     }
   </style>
 </head>
 <body>
-
-  <h1>Click Speed Game</h1>
-  <p class="timer">Time Left: <span id="time">10</span> seconds</p>
-  <button id="clickBtn" disabled>Click me!</button>
-  <div class="score">Score: <span id="score">0</span></div>
-  <button onclick="startGame()">Start Game</button>
+  <div class="container">
+    <h1>Click Speed Game</h1>
+    <p class="timer" id="timer">Time Left: 10 seconds</p>
+    <button id="clickBtn" disabled>Click me!</button>
+    <div class="score">Score: <span id="score">0</span></div>
+    <button id="startBtn">Start Game</button>
+    <div class="message" id="message"></div>
+  </div>
 
   <script>
     let score = 0;
     let timeLeft = 10;
     let countdown;
+    let preCountdown;
     const scoreDisplay = document.getElementById("score");
-    const timeDisplay = document.getElementById("time");
+    const timeDisplay = document.getElementById("timer");
     const clickBtn = document.getElementById("clickBtn");
+    const startBtn = document.getElementById("startBtn");
+    const message = document.getElementById("message");
 
     function startGame() {
       score = 0;
       timeLeft = 10;
       scoreDisplay.textContent = score;
-      timeDisplay.textContent = timeLeft;
-      clickBtn.disabled = false;
-
-      countdown = setInterval(() => {
-        timeLeft--;
-        timeDisplay.textContent = timeLeft;
-        if (timeLeft === 0) {
-          clearInterval(countdown);
-          clickBtn.disabled = true;
-          alert("Time's up! You clicked " + score + " times!");
+      message.textContent = '';
+      startBtn.disabled = true;
+      clickBtn.disabled = true;
+      timeDisplay.textContent = "Get ready...";
+      
+      let prepTime = 3;
+      preCountdown = setInterval(() => {
+        timeDisplay.textContent = `Starting in ${prepTime}...`;
+        prepTime--;
+        if (prepTime < 0) {
+          clearInterval(preCountdown);
+          timeDisplay.textContent = `Time Left: ${timeLeft} seconds`;
+          clickBtn.disabled = false;
+          clickBtn.focus();
+          countdown = setInterval(gameTick, 1000);
         }
       }, 1000);
+    }
+
+    function gameTick() {
+      timeLeft--;
+      timeDisplay.textContent = `Time Left: ${timeLeft} seconds`;
+      if (timeLeft === 0) {
+        endGame();
+      }
+    }
+
+    function endGame() {
+      clearInterval(countdown);
+      clickBtn.disabled = true;
+      startBtn.disabled = false;
+      timeDisplay.textContent = "Game Over!";
+      showMessage();
+    }
+
+    function showMessage() {
+      if (score >= 80) message.textContent = "Amazing speed! You're a clicking pro!";
+      else if (score >= 50) message.textContent = "Great job! Keep practicing!";
+      else if (score > 0) message.textContent = "Good start! Try to beat your score!";
+      else message.textContent = "You didn't click? Try again!";
     }
 
     clickBtn.addEventListener("click", () => {
       score++;
       scoreDisplay.textContent = score;
     });
-  </script>
 
+    startBtn.addEventListener("click", startGame);
+  </script>
 </body>
 </html>
