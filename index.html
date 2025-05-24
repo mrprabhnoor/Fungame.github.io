@@ -2,150 +2,159 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Snake Game</title>
   <style>
     body {
-      background: #000;
       margin: 0;
+      font-family: sans-serif;
+      background: #000;
       display: flex;
       flex-direction: column;
       align-items: center;
-      font-family: monospace;
-      color: #0f0;
-      user-select: none;
+      color: white;
     }
-    #canvas {
+    canvas {
+      border: 2px solid #fff;
       background: #111;
-      border: 4px solid #0f0;
       margin-top: 20px;
-      touch-action: none;
     }
-    #score, #startBtn {
-      margin: 20px;
-      font-size: 20px;
+    #controls {
+      margin-top: 15px;
     }
-    #startBtn {
-      padding: 10px 25px;
-      background: #0f0;
-      color: #000;
+    #mobile-controls {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn {
+      background: #444;
+      color: white;
       border: none;
+      padding: 15px;
+      font-size: 18px;
       border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    #startBtn:active {
-      background: #6f6;
+      min-width: 60px;
     }
   </style>
+  <audio id="eatSound" src="https://www.fesliyanstudios.com/play-mp3/387" preload="auto"></audio>
 </head>
 <body>
-  <h2>Classic Snake</h2>
-  <canvas id="canvas" width="320" height="320"></canvas>
-  <div id="score">Score: 0</div>
-  <button id="startBtn">Start Game</button>
+  <h1>Snake Game</h1>
+  <div id="controls">
+    <label for="difficulty">Difficulty:</label>
+    <select id="difficulty">
+      <option value="150">Easy</option>
+      <option value="100" selected>Medium</option>
+      <option value="60">Hard</option>
+    </select>
+  </div>
+  <canvas id="gameCanvas" width="300" height="300"></canvas>
+  <div id="mobile-controls">
+    <div class="row"><button class="btn" onclick="changeDirection('up')">↑</button></div>
+    <div class="row">
+      <button class="btn" onclick="changeDirection('left')">←</button>
+      <button class="btn" onclick="changeDirection('down')">↓</button>
+      <button class="btn" onclick="changeDirection('right')">→</button>
+    </div>
+  </div>
 
   <script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const grid = 16;
-    const tileCount = canvas.width / grid;
-    const scoreDisplay = document.getElementById('score');
-    const startBtn = document.getElementById('startBtn');
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const eatSound = document.getElementById("eatSound");
+    const difficultySelect = document.getElementById("difficulty");
 
-    let snake, direction, food, score, gameOver, frameCount;
+    const box = 20;
+    const canvasSize = canvas.width;
+    let snake = [{ x: 160, y: 160 }];
+    let direction = "right";
+    let food = spawnFood();
+    let score = 0;
+    let frameDelay = parseInt(difficultySelect.value);
+    let gameInterval;
 
-    function placeFood() {
-      food = {
-        x: Math.floor(Math.random() * tileCount),
-        y: Math.floor(Math.random() * tileCount)
+    difficultySelect.addEventListener("change", () => {
+      frameDelay = parseInt(difficultySelect.value);
+      clearInterval(gameInterval);
+      gameInterval = setInterval(gameLoop, frameDelay);
+    });
+
+    function spawnFood() {
+      return {
+        x: Math.floor(Math.random() * (canvasSize / box)) * box,
+        y: Math.floor(Math.random() * (canvasSize / box)) * box
       };
-      if (snake.some(s => s.x === food.x && s.y === food.y)) placeFood();
     }
 
-    function resetGame() {
-      snake = [{x: 8, y: 8}];
-      direction = {x: 1, y: 0}; // start moving right
-      score = 0;
-      gameOver = false;
-      frameCount = 0;
-      placeFood();
-      scoreDisplay.textContent = "Score: 0";
-      gameLoop();
+    function drawBox(x, y, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, box, box);
     }
 
     function gameLoop() {
-      if (gameOver) {
-        ctx.fillStyle = "#0f0";
-        ctx.font = "18px monospace";
-        ctx.fillText("GAME OVER", 90, 150);
-        ctx.fillText("Tap 'Start' to play again", 35, 180);
-        return;
-      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      requestAnimationFrame(gameLoop);
-      if (++frameCount < 8) return;
-      frameCount = 0;
+      // Move snake
+      let head = { ...snake[0] };
+      if (direction === "right") head.x += box;
+      else if (direction === "left") head.x -= box;
+      else if (direction === "up") head.y -= box;
+      else if (direction === "down") head.y += box;
 
-      const head = {x: snake[0].x + direction.x, y: snake[0].y + direction.y};
-
-      if (
-        head.x < 0 || head.x >= tileCount ||
-        head.y < 0 || head.y >= tileCount ||
-        snake.some(s => s.x === head.x && s.y === head.y)
-      ) {
-        gameOver = true;
+      // Check wall collision
+      if (head.x < 0 || head.x >= canvasSize || head.y < 0 || head.y >= canvasSize || snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+        alert("Game Over! Your score: " + score);
+        snake = [{ x: 160, y: 160 }];
+        direction = "right";
+        food = spawnFood();
+        score = 0;
+        clearInterval(gameInterval);
+        gameInterval = setInterval(gameLoop, frameDelay);
         return;
       }
 
       snake.unshift(head);
+
+      // Check food
       if (head.x === food.x && head.y === food.y) {
         score++;
-        scoreDisplay.textContent = "Score: " + score;
-        placeFood();
+        eatSound.currentTime = 0;
+        eatSound.play();
+        food = spawnFood();
       } else {
         snake.pop();
       }
 
-      ctx.fillStyle = "#111";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = "#0f0";
-      ctx.fillRect(food.x * grid, food.y * grid, grid - 2, grid - 2);
-      snake.forEach(s => {
-        ctx.fillRect(s.x * grid, s.y * grid, grid - 2, grid - 2);
+      // Draw everything
+      snake.forEach((segment, index) => {
+        drawBox(segment.x, segment.y, index === 0 ? "#0f0" : "#0b0");
       });
+
+      drawBox(food.x, food.y, "red");
     }
 
-    // Direction controls
-    window.addEventListener("keydown", e => {
-      switch (e.key) {
-        case "ArrowUp": if (direction.y !== 1) direction = {x: 0, y: -1}; break;
-        case "ArrowDown": if (direction.y !== -1) direction = {x: 0, y: 1}; break;
-        case "ArrowLeft": if (direction.x !== 1) direction = {x: -1, y: 0}; break;
-        case "ArrowRight": if (direction.x !== -1) direction = {x: 1, y: 0}; break;
-      }
+    function changeDirection(dir) {
+      if (dir === "left" && direction !== "right") direction = "left";
+      else if (dir === "right" && direction !== "left") direction = "right";
+      else if (dir === "up" && direction !== "down") direction = "up";
+      else if (dir === "down" && direction !== "up") direction = "down";
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") changeDirection("left");
+      else if (e.key === "ArrowRight") changeDirection("right");
+      else if (e.key === "ArrowUp") changeDirection("up");
+      else if (e.key === "ArrowDown") changeDirection("down");
     });
 
-    // Swipe support
-    let startX = 0, startY = 0;
-    canvas.addEventListener("touchstart", e => {
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-    });
-    canvas.addEventListener("touchend", e => {
-      const dx = e.changedTouches[0].clientX - startX;
-      const dy = e.changedTouches[0].clientY - startY;
-      if (Math.abs(dx) > Math.abs(dy)) {
-        if (dx > 20 && direction.x !== -1) direction = {x: 1, y: 0};
-        else if (dx < -20 && direction.x !== 1) direction = {x: -1, y: 0};
-      } else {
-        if (dy > 20 && direction.y !== -1) direction = {x: 0, y: 1};
-        else if (dy < -20 && direction.y !== 1) direction = {x: 0, y: -1};
-      }
-    });
-
-    startBtn.addEventListener("click", resetGame);
+    gameInterval = setInterval(gameLoop, frameDelay);
   </script>
 </body>
 </html>
