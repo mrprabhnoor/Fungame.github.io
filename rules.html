@@ -3,15 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Server Rules | Test Minecraft Server</title>
+  <title>Welcome | Test Minecraft Server</title>
   <link href="style.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #0b0b0b, #1a1a1a);
+      color: #f0f0f0;
+    }
+    header {
+      background: #111;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.8em;
+      color: #00ff99;
+    }
+    nav {
+      margin-top: 15px;
+    }
+    nav a {
+      color: #ccc;
+      margin: 0 14px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.2s ease-in-out;
+    }
+    nav a.active, nav a:hover {
+      color: #00ffcc;
+    }
+    .hero {
+      padding: 100px 20px;
+      text-align: center;
+      background: url('https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/50/Survival1.17.png/revision/latest/scale-to-width-down/1920?cb=20210821180103') center/cover no-repeat;
+      box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.7);
+    }
+    .hero h2 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      color: #ffffff;
+      text-shadow: 2px 2px 8px #000;
+    }
+    .hero p {
+      font-size: 1.2em;
+      color: #e0e0e0;
+      margin: 10px 0;
+      text-shadow: 1px 1px 6px #000;
+    }
+    .hero code {
+      background: #333;
+      padding: 4px 8px;
+      border-radius: 5px;
+      font-family: monospace;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 25px;
+      padding: 14px 28px;
+      background-color: #00cc88;
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 10px;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .btn:hover {
+      background-color: #00b377;
+      transform: scale(1.05);
+    }
+    footer {
+      text-align: center;
+      background: #111;
+      padding: 20px;
+      font-size: 0.9em;
+      color: #aaa;
+    }
+    footer a {
+      color: #00ffcc;
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
   <header>
     <h1>Test Minecraft Server</h1>
     <nav>
-      <a href="index.html">Home</a>
-      <a href="rules.html" class="active">Rules</a>
+      <a href="index.html" class="active">Home</a>
+      <a href="rules.html">Rules</a>
       <a href="staff.html">Staff</a>
       <a href="vote.html">Vote</a>
       <a href="contact.html">Contact</a>
@@ -19,16 +104,11 @@
   </header>
 
   <main>
-    <section class="content">
-      <h2>📜 Server Rules</h2>
-      <ul class="rules-list">
-        <li>❌ No griefing or stealing.</li>
-        <li>🗣️ Respect all players and staff.</li>
-        <li>🚫 No hacking, X-ray, or unfair mods.</li>
-        <li>💬 Keep chat clean. No spam, hate, or NSFW.</li>
-        <li>📌 Use common sense and follow staff directions.</li>
-      </ul>
-      <p class="note">Breaking rules may result in warnings, kicks, or bans. Play fair and have fun!</p>
+    <section class="hero">
+      <h2>Welcome to Test!</h2>
+      <p>🎮 A friendly survival server where you can build, explore, and play fair.</p>
+      <p><strong>Server IP:</strong> <code>test.aternos.me</code></p>
+      <a href="rules.html" class="btn">📜 View Server Rules</a>
     </section>
   </main>
 
