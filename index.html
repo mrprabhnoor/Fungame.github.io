@@ -1,145 +1,35 @@
-from zipfile import ZipFile
-import os
-
-# Directory to hold the site files
-site_dir = "/mnt/data/minecraft_test_site"
-os.makedirs(site_dir, exist_ok=True)
-
-# HTML content
-html_content = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Minecraft Server</title>
-    <link href="style.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome | Test Minecraft Server</title>
+  <link href="style.css" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <h1>Test Minecraft Server</h1>
-        <nav>
-            <a href="#home">Home</a>
-            <a href="#about">About</a>
-            <a href="#join">Join</a>
-            <a href="#rules">Rules</a>
-            <a href="#staff">Staff</a>
-            <a href="#vote">Vote</a>
-            <a href="#contact">Contact</a>
-        </nav>
-    </header>
+  <header>
+    <h1>Test Minecraft Server</h1>
+    <nav>
+      <a href="index.html" class="active">Home</a>
+      <a href="rules.html">Rules</a>
+      <a href="staff.html">Staff</a>
+      <a href="vote.html">Vote</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
 
-    <section id="home">
-        <h2>Welcome to Test!</h2>
-        <p>Survive, build, and play with friends in our Minecraft world.</p>
-        <p><strong>Server IP:</strong> test.aternos.me</p>
+  <main>
+    <section class="hero">
+      <h2>Welcome to Test!</h2>
+      <p>🎮 A friendly survival server where you can build, explore, and play fair.</p>
+      <p><strong>Server IP:</strong> <code>test.aternos.me</code></p>
+      <a href="rules.html" class="btn">📜 View Server Rules</a>
     </section>
+  </main>
 
-    <section id="about">
-        <h2>About</h2>
-        <p>This is a placeholder Minecraft server website. You can customize this section later with your own server details.</p>
-    </section>
-
-    <section id="join">
-        <h2>How to Join</h2>
-        <ol>
-            <li>Open Minecraft</li>
-            <li>Click "Multiplayer"</li>
-            <li>Click "Add Server"</li>
-            <li>Enter: test.aternos.me</li>
-            <li>Join and have fun!</li>
-        </ol>
-    </section>
-
-    <section id="rules">
-        <h2>Server Rules</h2>
-        <ul>
-            <li>No griefing or stealing</li>
-            <li>Respect all players</li>
-            <li>No hacking or cheating</li>
-            <li>Use common sense</li>
-        </ul>
-    </section>
-
-    <section id="staff">
-        <h2>Our Staff</h2>
-        <p>Coming soon! We'll update this section with our awesome team.</p>
-    </section>
-
-    <section id="vote">
-        <h2>Vote for Us</h2>
-        <p>Support the server and get rewards! <a href="https://topg.org/minecraft-servers" target="_blank">Vote here</a>.</p>
-    </section>
-
-    <section id="contact">
-        <h2>Join Our Discord</h2>
-        <p>Need help? Want to chat? <a href="https://discord.gg/kmjq6dCFNs" target="_blank">Join our Discord server</a>.</p>
-    </section>
-
-    <footer>
-        <p>&copy; 2025 Test Minecraft Server. All rights reserved.</p>
-    </footer>
+  <footer>
+    <p>&copy; 2025 Test Minecraft Server | <a href="https://discord.gg/kmjq6dCFNs" target="_blank">Join our Discord</a></p>
+  </footer>
 </body>
 </html>
-"""
 
-# CSS content
-css_content = """
-body {
-    font-family: Arial, sans-serif;
-    background-color: #1a1a1a;
-    color: #f0f0f0;
-    margin: 0;
-    padding: 0;
-    scroll-behavior: smooth;
-}
-header {
-    background-color: #111;
-    padding: 20px;
-    text-align: center;
-}
-header h1 {
-    margin: 0;
-    font-size: 2em;
-}
-nav {
-    margin-top: 10px;
-}
-nav a {
-    color: #00ff99;
-    text-decoration: none;
-    margin: 0 10px;
-    font-weight: bold;
-}
-nav a:hover {
-    text-decoration: underline;
-}
-section {
-    padding: 40px;
-    border-bottom: 1px solid #333;
-}
-footer {
-    background-color: #111;
-    text-align: center;
-    padding: 10px;
-    font-size: 0.9em;
-}
-"""
-
-# Write files
-with open(f"{site_dir}/index.html", "w") as f:
-    f.write(html_content)
-
-with open(f"{site_dir}/style.css", "w") as f:
-    f.write(css_content)
-
-# Create ZIP
-zip_path = "/mnt/data/minecraft_server_site.zip"
-with ZipFile(zip_path, 'w') as zipf:
-    for foldername, subfolders, filenames in os.walk(site_dir):
-        for filename in filenames:
-            file_path = os.path.join(foldername, filename)
-            arcname = os.path.relpath(file_path, site_dir)
-            zipf.write(file_path, arcname)
-
-zip_path
